@@ -8,4 +8,9 @@ describe Bike do
   it 'checks that the bike is working' do
     expect(Bike.new.working?).to be true
   end
+
+  it "can be reported as broken" do
+    subject.report_broken
+    expect(subject).to be_broken
+  end
 end
