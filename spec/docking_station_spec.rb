@@ -25,25 +25,31 @@ describe DockingStation do
   describe "initialization" do
     subject { DockingStation.new }
     let(:bike) { Bike.new }
-    it "defaulrts capacity" do
+    it "defaults capacity" do
       described_class::DEFAULT_CAPACITY.times { subject.dock bike}
       expect{ subject.dock(bike) }.to raise_error "Docking station full"
     end
   end
 
   describe '#release_bike' do
-    let(:bike) { Bike.new }
+    # let(:bike) { Bike.new }
     subject { DockingStation.new }
-    it 'releases a bike' do
-      bike = Bike.new
+    it 'releases a working bike' do
+      bike = double :bike
+      allow(bike).to receive(:broken?).and_return(false)
       subject.dock(bike)
-      expect(subject.release_bike).to eq bike
+      # subject.release_bike
+      expect(subject.release_bike).not_to be_broken
     end
+
     it 'raises an error when there are no bikes available' do
       expect { subject.release_bike }.to raise_error "No bikes available"
     end
+
     it "does not release broken bikes" do
-      bike = Bike.new
+      bike = double :bike
+      allow(bike).to receive(:report_broken).and_return(true)
+      allow(bike).to receive(:broken?).and_return(true)
       bike.report_broken
       subject.dock(bike)
       expect{ subject.release_bike }.to raise_error "No bikes available"
@@ -51,14 +57,17 @@ describe DockingStation do
   end
 
   describe '#dock' do
+    let(:bike) { double :bike }
     it 'raiases error when trying to dock in full station' do
-      subject.capacity.times { subject.dock Bike.new }
-      expect { subject.dock Bike.new }.to raise_error "Docking station full"
+      allow(bike).to receive(:broken?).and_return(false)
+      subject.capacity.times { subject.dock bike }
+      expect { subject.dock bike }.to raise_error "Docking station full"
     end
     it 'has variable capacity' do
       station = DockingStation.new(40)
-      40.times { station.dock Bike.new }
-      expect{ station.dock Bike.new }.to raise_error "Docking station full"
+      allow(bike).to receive(:broken?).and_return(false)
+      40.times { station.dock bike }
+      expect{ station.dock bike }.to raise_error "Docking station full"
     end
   end
 end

@@ -6,7 +6,9 @@ describe Bike do
   end
 
   it 'checks that the bike is working' do
-    expect(Bike.new.working?).to be true
+    faulty_bike = Bike.new
+    faulty_bike.report_broken
+    expect(faulty_bike.working?).to be false
   end
 
   it "can be reported as broken" do
